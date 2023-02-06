@@ -2,6 +2,7 @@
 import os
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
 
 ############### variables ###############
 doc_text_pairs = {} # Dictionary of document name to document text pairs
@@ -48,6 +49,10 @@ def preprocessing(doc_text) :
 
     # Remove numbers and punctuation
     filtered_list = [word.lower() for word in filtered_list if word.isalpha()]
+
+    # Stemming w/ Porter Stemmer
+    stemmer = PorterStemmer()
+    filtered_list = [stemmer.stem(word) for word in filtered_list]
 
     # Return results
     return filtered_list
