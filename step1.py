@@ -11,8 +11,8 @@ def createTerms(fileName):
     """This function is to extract the text from file and tokenize the text, then create a dictionary where the key is the DocNum, the value is the
         terms in the document; and a index containing terms of all documents.
         parameter: a file path
-        return: a dictionary.
-    """
+        return: a dictionary."""
+
     docs_dic={}
     infile=open(fileName)
     docStr=""
@@ -39,6 +39,7 @@ def preprocessing(str):
     """This function is to remove the no character word in the text sunch as number and punctuation, also remove the stopwords and stem each word
     parameter:a string to process
     return: a list containing tokens which have been processed"""
+
     tokenizer=RegexpTokenizer(r'[A-Za-z]+')
     tokens=tokenizer.tokenize(str)
     tokensWithoutStopwords=[token for token in tokens if token not in stopwords.words('english')]
@@ -52,6 +53,7 @@ def vetorSpaceModel(doc_dic):
     parameter: a dictionary of the document number and list of tokens
     return: a double dictionary, which is a vetor space model containing terms, documents(key of the inner dictionary) and df(length of the inner dictionary) and 
     tf(the value of the inner dictionary)"""
+
     vectorSpace={}
     for term in index:
         tfs={}
@@ -70,6 +72,7 @@ def vetorSpaceModel(doc_dic):
 
 ########### test #############
 
-filePath="test.txt"
+filePath="test1.txt"
 dic=createTerms(filePath)
-vetorSpaceModel(dic)
+docSpace=vetorSpaceModel(dic)
+print(docSpace)
