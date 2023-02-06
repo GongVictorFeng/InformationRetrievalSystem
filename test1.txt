@@ -1,0 +1,42 @@
+<DOC>
+<DOCNO> AP880325-0001 </DOCNO>
+<FILEID>AP-NR-03-25-88 2331EST</FILEID>
+<1ST_LINE>u p AM-Bush 2ndLd-Writethru a0824 03-25 0776</1ST_LINE>
+<2ND_LINE>AM-Bush, 2nd Ld-Writethru, a0824,760</2ND_LINE>
+<HEAD>Bush Sticks To Game Plan; Says It Is Too Soon To Consider Running
+Mates</HEAD>
+<NOTE>EDs: Subs 9th graf bgng: He mentioned ... to CORRECT spelling of
+Deukmejian.</NOTE>
+<BYLINE>By DEBBIE NEWBY</BYLINE>
+<BYLINE>Associated Press Writer</BYLINE>
+<DATELINE>DENVER (AP) </DATELINE>
+<TEXT>
+  new york times
+</TEXT>
+</DOC>
+<DOC>
+<DOCNO> AP880325-0002 </DOCNO>
+<FILEID>AP-NR-03-25-88 0214EST</FILEID>
+<1ST_LINE>r w PM-US-Australia     03-25 0501</1ST_LINE>
+<2ND_LINE>PM-US-Australia,500</2ND_LINE>
+<HEAD>Linkletter Preparing for Brisbane Expo</HEAD>
+<BYLINE>By GENE KRAMER</BYLINE>
+<BYLINE>Associated Press Writer</BYLINE>
+<DATELINE>WASHINGTON (AP) </DATELINE>
+<TEXT>
+  new york post
+</TEXT>
+</DOC>
+<DOC>
+<DOCNO> AP880325-0003 </DOCNO>
+<FILEID>AP-NR-03-25-88 0222EST</FILEID>
+<1ST_LINE>r w PM-FarmScene     03-25 0986</1ST_LINE>
+<2ND_LINE>PM-Farm Scene,980</2ND_LINE>
+<HEAD>`Real' Price Of Wheat Lowest Since Revolution</HEAD>
+<BYLINE>By DON KENDALL</BYLINE>
+<BYLINE>AP Farm Writer</BYLINE>
+<DATELINE>WASHINGTON (AP) </DATELINE>
+<TEXT>
+  los angeles times
+</TEXT>
+</DOC>
