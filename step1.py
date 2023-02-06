@@ -1,4 +1,5 @@
 import nltk
+import math
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
@@ -51,20 +52,43 @@ def vetorSpaceModel(doc_dic):
     """this function is to create an inverted index, double dictionary is used, the key of vectorSpace is the token, the value of the vectorSpace
     is another dictionary, whose key is the document number, the value is the term frequency
     parameter: a dictionary of the document number and list of tokens
-    return: a double dictionary, which is a vetor space model containing terms, documents(key of the inner dictionary) and df(length of the inner dictionary) and 
-    tf(the value of the inner dictionary)"""
+    return: a list containning 3 data, the fist one is a double dictionary, which is a vetor space model containing terms, documents(key of the inner dictionary) and df(length of the inner dictionary) and 
+    tf(the value of the inner dictionary); the second one is a dictionary, the key is the token and the value is the idf of each token
+    the last one is a list containing the vector length of each document"""
 
+def vetorSpaceModel(doc_dic):
     vectorSpace={}
+    idfDic={}
+    N=len(doc_dic)
+    maxTf=0 #max term frequency for normalization
     for term in index:
         tfs={}
         dfNum=0
         for docNo in doc_dic:
             tf=doc_dic[docNo].count(term)
+            if tf>maxTf:
+                maxTf=tf
             if tf>0:
                 tfs[docNo]=tf
-                dfNum=dfNum+1
+                dfNum=dfNum+1  
+        #calculate idf of each term   
+        idfDic[term]=math.log(N/dfNum,2)
         vectorSpace[term]=tfs
-    return vectorSpace
+
+    #calculate vector length
+    vectorLength=[]
+    for docNo in doc_dic:
+        vectorLen=0
+        for token in vectorSpace:
+            try:
+              weight=(vectorSpace[token][docNo]/maxTf)*idfDic[token] 
+              vectorLen+=weight**2
+            except:
+                continue
+        vectorLen=math.sqrt(vectorLen)
+        vectorLength.append(vectorLen)
+
+    return [vectorSpace,idfDic,vectorLength]
 
 
 
@@ -75,4 +99,6 @@ def vetorSpaceModel(doc_dic):
 filePath="test1.txt"
 dic=createTerms(filePath)
 docSpace=vetorSpaceModel(dic)
-print(docSpace)
+print(docSpace[0])
+print(docSpace[1])
+print(docSpace[2])
