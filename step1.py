@@ -36,6 +36,9 @@ def createTerms(fileName):
     return docs_dic
 
 def preprocessing(str):
+    """This function is to remove the no character word in the text sunch as number and punctuation, also remove the stopwords and stem each word
+    parameter:a string to process
+    return: a list containing tokens which have been processed"""
     tokenizer=RegexpTokenizer(r'[A-Za-z]+')
     tokens=tokenizer.tokenize(str)
     tokensWithoutStopwords=[token for token in tokens if token not in stopwords.words('english')]
