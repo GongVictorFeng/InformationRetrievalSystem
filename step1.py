@@ -46,10 +46,30 @@ def preprocessing(str):
     stemmingTokens=[stemmer.stem(token) for token in tokensWithoutStopwords]
     return stemmingTokens
 
+def vetorSpaceModel(doc_dic):
+    """this function is to create an inverted index, double dictionary is used, the key of vectorSpace is the token, the value of the vectorSpace
+    is another dictionary, whose key is the document number, the value is the term frequency
+    parameter: a dictionary of the document number and list of tokens
+    return: a double dictionary, which is a vetor space model containing terms, documents(key of the inner dictionary) and df(length of the inner dictionary) and 
+    tf(the value of the inner dictionary)"""
+    vectorSpace={}
+    for term in index:
+        tfs={}
+        dfNum=0
+        for docNo in doc_dic:
+            tf=doc_dic[docNo].count(term)
+            if tf>0:
+                tfs[docNo]=tf
+                dfNum=dfNum+1
+        vectorSpace[term]=tfs
+    return vectorSpace
+
+
+
 
 
 ########### test #############
 
 filePath="test.txt"
 dic=createTerms(filePath)
-print(dic)
+vetorSpaceModel(dic)
