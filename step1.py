@@ -55,8 +55,7 @@ def vetorSpaceModel(doc_dic):
     return: a list containning 3 data, the fist one is a double dictionary, which is a vetor space model containing terms, documents(key of the inner dictionary) and df(length of the inner dictionary) and 
     tf(the value of the inner dictionary); the second one is a dictionary, the key is the token and the value is the idf of each token
     the last one is a list containing the vector length of each document"""
-
-def vetorSpaceModel(doc_dic):
+    
     vectorSpace={}
     idfDic={}
     N=len(doc_dic)
@@ -90,15 +89,32 @@ def vetorSpaceModel(doc_dic):
 
     return [vectorSpace,idfDic,vectorLength]
 
+def queryProcessor(fileName):
+    infile=open(fileName)
+    queries=[] # a 2d list, the row is the queries, the column is the keywords each query contains.
+    docStr=""
+    isText=False
+    for line in infile:
+        if line.__contains__("<title>"):
+            docStr+=line[6:]
+        if line.__contains__("<desc>" or "<narr>"):
+            isText=True
+            continue
+        if line.__contains__("</top>"):
+            isText=False
+            lowcaseStr=docStr.casefold()
+            tokens=preprocessing(lowcaseStr)
+            queries.append(tokens)
+            docStr=""
+        if isText:
+            docStr+=line.replace("\n"," ")
+    return queries
 
 
 
 
 ########### test #############
 
-filePath="test1.txt"
-dic=createTerms(filePath)
-docSpace=vetorSpaceModel(dic)
-print(docSpace[0])
-print(docSpace[1])
-print(docSpace[2])
+filePath="testQuery.txt"
+queries=queryProcessor(filePath)
+print(queries[0])

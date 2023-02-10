@@ -1,0 +1,22 @@
+<top>
+
+<num>1
+
+
+<title>Coping with overcrowded prisons
+
+<desc>
+
+The document will provide information on jail and prison overcrowding and 
+how inmates are forced to cope with those conditions; or it will reveal 
+plans to relieve the overcrowded condition.
+
+<narr>
+
+A relevant document will describe scenes of overcrowding that have 
+become all too common in jails and prisons around the country.  The 
+document will identify how inmates are forced to cope with those 
+overcrowded conditions, and/or what the Correctional System is doing, 
+or planning to do, to alleviate the crowded condition.
+
+</top>
