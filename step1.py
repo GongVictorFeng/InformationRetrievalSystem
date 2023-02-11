@@ -48,11 +48,11 @@ def preprocessing(str):
     stemmingTokens=[stemmer.stem(token) for token in tokensWithoutStopwords]
     return stemmingTokens
 
-def vetorSpaceModel(doc_dic):
+def vectorSpaceModel(doc_dic):
     """this function is to create an inverted index, double dictionary is used, the key of vectorSpace is the token, the value of the vectorSpace
     is another dictionary, whose key is the document number, the value is the term frequency
     parameter: a dictionary of the document number and list of tokens
-    return: a list containning 3 data, the fist one is a double dictionary, which is a vetor space model containing terms, documents(key of the inner dictionary) and df(length of the inner dictionary) and 
+    return: a list containning 3 data, the first one is a double dictionary, which is a vetor space model containing terms, documents(key of the inner dictionary) and df(length of the inner dictionary) and 
     tf(the value of the inner dictionary); the second one is a dictionary, the key is the token and the value is the idf of each token
     the last one is a list containing the vector length of each document"""
     
@@ -177,7 +177,7 @@ def ranking(similarity):
 
 filePath="test1.txt"
 doc_dic=createTerms(filePath)
-vector=vetorSpaceModel(doc_dic)
+vector=vectorSpaceModel(doc_dic)
 queryPath="testQuery1.txt"
 queries=queryProcessor(queryPath)
 similarity=retrieval(queries[0],vector)
