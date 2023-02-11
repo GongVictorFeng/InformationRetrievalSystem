@@ -75,7 +75,7 @@ def vetorSpaceModel(doc_dic):
         vectorSpace[term]=tfs
 
     #calculate vector length
-    vectorLength=[]
+    vectorLength={}
     for docNo in doc_dic:
         vectorLen=0
         for token in vectorSpace:
@@ -85,11 +85,16 @@ def vetorSpaceModel(doc_dic):
             except:
                 continue
         vectorLen=math.sqrt(vectorLen)
-        vectorLength.append(vectorLen)
+        vectorLength[docNo]=vectorLen
 
     return [vectorSpace,idfDic,vectorLength]
 
 def queryProcessor(fileName):
+    """This function is to extract the text from query file and tokenize the text, then create a 2D list where the row is query, the column is the
+    keyword in the query.
+    parameter: a file path
+    return: a 2D list."""
+
     infile=open(fileName)
     queries=[] # a 2d list, the row is the queries, the column is the keywords each query contains.
     docStr=""
@@ -97,7 +102,7 @@ def queryProcessor(fileName):
     for line in infile:
         if line.__contains__("<title>"):
             docStr+=line[6:]
-        if line.__contains__("<desc>" or "<narr>"):
+        if line.__contains__("<desc>") or line.__contains__("<narr>"):
             isText=True
             continue
         if line.__contains__("</top>"):
@@ -110,11 +115,70 @@ def queryProcessor(fileName):
             docStr+=line.replace("\n"," ")
     return queries
 
+def createQueryVector(query,vectorModel):
+    """This function is to compute the tf-idf weight for the query and the query length
+    parameter: a list containing keywords of a query and the vector space model which contains the idf that can be used to compute weight
+    return: a list, the first element is a dictionary, the key is the keyword, the value is the tf-idf weight; the second element is the query length"""
 
+    #Calculate the tf-idf of each term in the query and the length of the query
+    queryLength=0
+    queryTermWeights={}
+    maxTf=0 #max term frequency for normalization
+    #calculate tf
+    for term in index:
+        tf=query.count(term)
+        if tf>maxTf:
+            maxTf=tf
+        if tf>0:
+            queryTermWeights[term]=tf
+    #calculate tf-idf and query length
+    for queryTerm in queryTermWeights:
+        #vectorModel[1] is the dictionary of idf,the key is the term in the index
+        weight=(queryTermWeights[queryTerm]/maxTf)*vectorModel[1][queryTerm]
+        queryTermWeights[queryTerm]=weight
+        queryLength+=weight**2
+    queryLength=math.sqrt(queryLength)
+    return [queryTermWeights,queryLength]
 
+def retrieval(query,vectorModel):
+    """This function is to retrieve all relevant data and calculate the similarity of each document
+    parameter: the first one is the keyword list of the query, the second one is the vector space model of the collection
+    return: a dictionary, the key is the document identity, the value is the similarity"""
+
+    #get query vector and the query length
+    queryVector=createQueryVector(query,vectorModel)
+
+    #retrieve all relevant doc using the invert indexing
+    relevantDocSet=set() #using set to remove duplicate
+    for queryword in query:
+        relevantDocs=vectorModel[0][queryword]
+        for doc in relevantDocs:
+            relevantDocSet.add(doc) #add relevant doc to the set
+    
+    #Calculate similarity for each relevant documents
+    similarities={}
+    for doc in relevantDocSet:
+        similarity=0
+        for word in queryVector[0]:
+            #multiply the corresponding item in query vector and document vector, and then add all corresponding values to get the similarity of each doc
+            try:
+                similarity+=vectorModel[0][word][doc]*vectorModel[1][word]*queryVector[0][word]
+            except:
+                continue
+        similarities[doc]=similarity/(vectorModel[2][doc]*queryVector[1])
+    return similarities
+
+def ranking(similarity):
+    """this function is simply sort the dictionary of documents according to the similarity value """
+    sortedDoc=sorted(similarity,reverse=False) #reverse sets to False means descending order
+    print(sortedDoc)
 
 ########### test #############
 
-filePath="testQuery.txt"
-queries=queryProcessor(filePath)
-print(queries[0])
+filePath="test1.txt"
+doc_dic=createTerms(filePath)
+vector=vetorSpaceModel(doc_dic)
+queryPath="testQuery1.txt"
+queries=queryProcessor(queryPath)
+similarity=retrieval(queries[0],vector)
+ranking(similarity)
