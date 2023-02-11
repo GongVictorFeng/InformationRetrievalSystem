@@ -1,4 +1,4 @@
-import nltk
+import os
 import math
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
@@ -34,6 +34,7 @@ def createTerms(fileName):
             index.update(tokens)
             docs_dic[docNo]=tokens
             docStr=""
+    infile.close()
     return docs_dic
 
 def preprocessing(str):
@@ -52,7 +53,7 @@ def vectorSpaceModel(doc_dic):
     """this function is to create an inverted index, double dictionary is used, the key of vectorSpace is the token, the value of the vectorSpace
     is another dictionary, whose key is the document number, the value is the term frequency
     parameter: a dictionary of the document number and list of tokens
-    return: a list containning 3 data, the first one is a double dictionary, which is a vetor space model containing terms, documents(key of the inner dictionary) and df(length of the inner dictionary) and 
+    return: a list containning 3 data, the first one is a double dictionary, which is a vector space model containing terms, documents(key of the inner dictionary) and df(length of the inner dictionary) and 
     tf(the value of the inner dictionary); the second one is a dictionary, the key is the token and the value is the idf of each token
     the last one is a list containing the vector length of each document"""
     
@@ -113,6 +114,7 @@ def queryProcessor(fileName):
             docStr=""
         if isText:
             docStr+=line.replace("\n"," ")
+    infile.close()
     return queries
 
 def createQueryVector(query,vectorModel):
@@ -148,12 +150,13 @@ def retrieval(query,vectorModel):
     #get query vector and the query length
     queryVector=createQueryVector(query,vectorModel)
 
-    #retrieve all relevant doc using the invert indexing
-    relevantDocSet=set() #using set to remove duplicate
+    #retrieve all relevant docs using the inverted indexing
+    relevantDocSet=set() #using set to remove duplicates
     for queryword in query:
-        relevantDocs=vectorModel[0][queryword]
-        for doc in relevantDocs:
-            relevantDocSet.add(doc) #add relevant doc to the set
+        if queryword in vectorModel[0]:
+            relevantDocs=vectorModel[0][queryword]
+            for doc in relevantDocs:
+                relevantDocSet.add(doc) #add relevant doc to the set
     
     #Calculate similarity for each relevant documents
     similarities={}
@@ -169,16 +172,59 @@ def retrieval(query,vectorModel):
     return similarities
 
 def ranking(similarity):
-    """this function is simply sort the dictionary of documents according to the similarity value """
-    sortedDoc=sorted(similarity,reverse=False) #reverse sets to False means descending order
-    print(sortedDoc)
+    """This function is sorts the dictionary of documents by similarity value and stores the results as a list of tuples
+    parameter: a dictionary of document number and similarity value
+    return: an ordered list of tuples (document number, similarity value) sorted from greatest to least"""
+    sortedDoc=sorted(similarity,reverse=True,key=similarity.get) #reverse sets to True means descending order
+    rankedList=[]
+    for doc in sortedDoc:
+        rankedList.append((doc,similarity[doc]))
+    return rankedList # TODO: return only top 1000 results for each query
+
+def outputToFile(outfile, query_num,rankedList):
+    """This function writes the results of a query into a file with the format specified by the assignment
+    parameter: file to write into, number of the current query (1-50), list of documents ranked by similarity score
+    returns: none"""
+    for doc_rank in range(len(rankedList)):
+        doc_num=str(rankedList[doc_rank][0])
+        doc_score=str(rankedList[doc_rank][1])
+        formattedQueryRank=str(query_num)+" Q0 "+" "+doc_num+" "+str(doc_rank+1)+" "+doc_score+" "+"tag_name"
+        outfile.write(formattedQueryRank+"\n")
+
+
+########### main #############
+
+#get a list of all files in the coll/ directory
+lst_filenames=os.listdir("coll")
+
+#open each file one by one, separate the documents within file
+#process into tokens and save (document number, tokens) as key-value pair
+doc_dic={}
+for filename in lst_filenames:
+    file_path="coll\\"+filename
+    part_doc_dic=createTerms(file_path)
+    doc_dic=doc_dic | part_doc_dic
+
+#create inverted index from documents and tokens
+vector=vectorSpaceModel(doc_dic)
+
+#process queries into tokens
+queryPath="topics1-50.txt"
+queries=queryProcessor(queryPath)
+
+outfile=open("Results","w")
+for query_num in range(len(queries)):
+    similarity=retrieval(queries[query_num],vector) #retrieve relevant documents
+    rankedList=ranking(similarity) #rank by similarity
+    outputToFile(outfile, query_num,rankedList) #write results to file
+outfile.close()
 
 ########### test #############
 
-filePath="test1.txt"
-doc_dic=createTerms(filePath)
-vector=vectorSpaceModel(doc_dic)
-queryPath="testQuery1.txt"
-queries=queryProcessor(queryPath)
-similarity=retrieval(queries[0],vector)
-ranking(similarity)
+# filePath="test1.txt"
+# doc_dic=createTerms(filePath)
+# vector=vectorSpaceModel(doc_dic)
+# queryPath="testQuery1.txt"
+# queries=queryProcessor(queryPath)
+# similarity=retrieval(queries[0],vector)
+# ranking(similarity)
