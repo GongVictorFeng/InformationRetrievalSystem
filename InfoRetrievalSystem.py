@@ -74,6 +74,7 @@ def vectorSpaceModel(doc_dic):
         #calculate idf of each term   
         idfDic[term]=math.log(N/dfNum,2)
         vectorSpace[term]=tfs
+    print("Inverted index created")
 
     #calculate vector length
     vectorLength={}
@@ -204,20 +205,26 @@ for filename in lst_filenames:
     file_path="coll\\"+filename
     part_doc_dic=createTerms(file_path)
     doc_dic=doc_dic | part_doc_dic
+    print(filename,"has finished prepreocessing")
 
 #create inverted index from documents and tokens
 vector=vectorSpaceModel(doc_dic)
+print("Vector lengths calculated")
 
 #process queries into tokens
 queryPath="topics1-50.txt"
 queries=queryProcessor(queryPath)
+print("Query vectors created")
 
 outfile=open("Results","w")
 for query_num in range(len(queries)):
     similarity=retrieval(queries[query_num],vector) #retrieve relevant documents
     rankedList=ranking(similarity) #rank by similarity
     outputToFile(outfile, query_num,rankedList) #write results to file
+    print("Query Number", query_num, "finished")
 outfile.close()
+
+print("All done!")
 
 ########### test #############
 
