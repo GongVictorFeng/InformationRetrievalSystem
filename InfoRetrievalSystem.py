@@ -184,9 +184,10 @@ def ranking(similarity):
     return: an ordered list of tuples (document number, similarity value) sorted from greatest to least"""
     sortedDoc=sorted(similarity,reverse=True,key=similarity.get) #reverse sets to True means descending order
     rankedList=[]
-    for doc in sortedDoc:
+    for i in range(min(1000,len(sortedDoc))):
+        doc=sortedDoc[i]
         rankedList.append((doc,similarity[doc]))
-    return rankedList # TODO: return only top 1000 results for each query
+    return rankedList
 
 def outputToFile(outfile, query_num,rankedList):
     """This function writes the results of a query into a file with the format specified by the assignment
