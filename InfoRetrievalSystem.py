@@ -1,5 +1,6 @@
 import os
 import math
+import time #progress bar
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
@@ -61,6 +62,8 @@ def vectorSpaceModel(doc_dic):
     idfDic={}
     N=len(doc_dic)
     maxTf=0 #max term frequency for normalization
+    count=0 #progress bar
+    num_total=len(index) #progress bar
     for term in index:
         tfs={}
         dfNum=0
@@ -74,7 +77,10 @@ def vectorSpaceModel(doc_dic):
         #calculate idf of each term   
         idfDic[term]=math.log(N/dfNum,2)
         vectorSpace[term]=tfs
-    print("Inverted index created")
+        count+=1 #progress bar
+        if (count%500==0):
+            print("Creating Inverted Index:",count,"/",num_total,"terms") #progress bar
+        
 
     #calculate vector length
     vectorLength={}
@@ -201,30 +207,39 @@ lst_filenames=os.listdir("coll")
 #open each file one by one, separate the documents within file
 #process into tokens and save (document number, tokens) as key-value pair
 doc_dic={}
+count=0 #progress bar
+num_total=len(lst_filenames) #progress bar
+startTime=time.perf_counter() #progress bar
 for filename in lst_filenames:
     file_path="coll\\"+filename
     part_doc_dic=createTerms(file_path)
     doc_dic=doc_dic | part_doc_dic
-    print(filename,"has finished prepreocessing")
+    count+=1 #progress bar
+    print("Preprocessing:",count,"/",num_total,"documents") #progress bar
+endTime=time.perf_counter() #progress bar
+print("Preprocessing elapsed time:",endTime-startTime,"seconds") #progress bar
 
 #create inverted index from documents and tokens
+startTime=time.perf_counter() #progress bar
 vector=vectorSpaceModel(doc_dic)
-print("Vector lengths calculated")
+endTime=time.perf_counter() #progress bar
+print("Preprocessing elapsed time:",endTime-startTime,"seconds") #progress bar
+
 
 #process queries into tokens
 queryPath="topics1-50.txt"
 queries=queryProcessor(queryPath)
-print("Query vectors created")
+print("Query vectors created") #progress bar
 
 outfile=open("Results","w")
 for query_num in range(len(queries)):
     similarity=retrieval(queries[query_num],vector) #retrieve relevant documents
     rankedList=ranking(similarity) #rank by similarity
-    outputToFile(outfile, query_num,rankedList) #write results to file
-    print("Query Number", query_num, "finished")
+    outputToFile(outfile,query_num,rankedList) #write results to file
+    print("Query Number",query_num,"finished") #progress bar
 outfile.close()
 
-print("All done!")
+print("All done!") #progress bar
 
 ########### test #############
 
