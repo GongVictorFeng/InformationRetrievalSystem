@@ -259,13 +259,3 @@ endTime=time.perf_counter() #progress bar
 print("Query processing, ranking, retrieval elapsed time:",endTime-startTime,"seconds") #progress bar
 
 print("All done!") #progress bar
-
-########### test #############
-
-# filePath="test1.txt"
-# doc_dic=createTerms(filePath)
-# vector=vectorSpaceModel(doc_dic)
-# queryPath="testQuery1.txt"
-# queries=queryProcessor(queryPath)
-# similarity=retrieval(queries[0],vector)
-# ranking(similarity)
