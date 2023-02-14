@@ -229,6 +229,7 @@ for filename in lst_filenames :
     separate_docs(f)
     count+=1
     print("Preprocessing:", count, "/", len(lst_filenames))
+    f.close()
 endTime = time.perf_counter()
 print("Preprocessing elapsed time:",endTime-startTime,"seconds") #progress bar
 
