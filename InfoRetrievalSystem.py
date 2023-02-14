@@ -11,10 +11,10 @@ index=set() # a set containing all terms, using set to remove duplicates
 
 # Function to separate file into documents
 def separate_docs(f):
+    doc_text=""
     while True:
         line=f.readline()
-
-        if not line:
+        if not line :
             # Stop reading at end of file
             break
         elif (line.__contains__("<DOCNO>")):
@@ -23,7 +23,7 @@ def separate_docs(f):
         elif (line.__contains__("<TEXT>")):
             doc_text=""
             line=f.readline()
-            while (not line.__contains__("</TEXT>")):
+            while (not line.__contains__("</TEXT>") and line):
                 doc_text+=line.replace("\n", " ")
                 line=f.readline()
         elif (line.__contains__("</DOC>")):
@@ -189,7 +189,10 @@ def retrieval(query,vectorModel):
                 similarity+=vectorModel[0][word][doc]*vectorModel[1][word]*queryVector[0][word]
             except:
                 continue
-        similarities[doc]=similarity/(vectorModel[2][doc]*queryVector[1])
+        if (vectorModel[2][doc]*queryVector[1] == 0):
+            similarities[doc] = 0
+        else:
+            similarities[doc]=similarity/(vectorModel[2][doc]*queryVector[1])
     return similarities
 
 def ranking(similarity):
@@ -249,7 +252,7 @@ outfile=open("Results","w")
 for query_num in range(len(queries)):
     similarity=retrieval(queries[query_num],vector) #retrieve relevant documents
     rankedList=ranking(similarity) #rank by similarity
-    outputToFile(outfile,query_num,rankedList) #write results to file
+    outputToFile(outfile,query_num+1,rankedList) #write results to file
 outfile.close()
 
 endTime=time.perf_counter() #progress bar
