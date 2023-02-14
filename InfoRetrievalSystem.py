@@ -58,40 +58,43 @@ def vectorSpaceModel(doc_dic):
     tf(the value of the inner dictionary); the second one is a dictionary, the key is the token and the value is the idf of each token
     the last one is a list containing the vector length of each document"""
     
+    #count frequency of each word in its respective document, stored double dictionary
+    #format: {document_num : {token : token_freq}}
+    doc_token_freqs={}
+    for docNo in doc_dic:
+        doc_token_freqs[docNo]={}
+        for token in doc_dic[docNo]:
+            if (token in doc_token_freqs[docNo]):
+                doc_token_freqs[docNo][token]+=1
+            else:
+                doc_token_freqs[docNo][token]=1
+
+    #build vector space
     vectorSpace={}
     idfDic={}
-    N=len(doc_dic)
+    num_documents=len(doc_dic)
     maxTf=0 #max term frequency for normalization
-    count=0 #progress bar
-    num_total=len(index) #progress bar
-    for term in index:
-        tfs={}
-        dfNum=0
-        for docNo in doc_dic:
-            tf=doc_dic[docNo].count(term)
-            if tf>maxTf:
-                maxTf=tf
-            if tf>0:
-                tfs[docNo]=tf
-                dfNum=dfNum+1  
-        #calculate idf of each term   
-        idfDic[term]=math.log(N/dfNum,2)
-        vectorSpace[term]=tfs
-        count+=1 #progress bar
-        if (count%500==0):
-            print("Creating Inverted Index:",count,"/",num_total,"terms") #progress bar
-        
+    for docNo in doc_token_freqs:
+        for token in doc_token_freqs[docNo]:
+            tf=doc_token_freqs[docNo][token]
+            maxTf=max(maxTf,tf) #saving max tf for normalization
+            if (token not in vectorSpace):
+                vectorSpace[token]={}
+            vectorSpace[token][docNo]=tf
 
-    #calculate vector length
+    #calculate each term's idf
+    for token in vectorSpace:
+        dfNum=len(vectorSpace[token]) #len(dict) has O(1) according to Python Libraries
+        idfDic[token]=math.log(num_documents/dfNum,2)
+
+    #calculate document vector length
     vectorLength={}
-    for docNo in doc_dic:
+    for docNo in doc_token_freqs:
         vectorLen=0
-        for token in vectorSpace:
-            try:
-              weight=(vectorSpace[token][docNo]/maxTf)*idfDic[token] 
-              vectorLen+=weight**2
-            except:
-                continue
+        for token in doc_token_freqs[docNo]:
+            tf=doc_token_freqs[docNo][token]
+            weight=(tf/maxTf)*idfDic[token]
+            vectorLen+=weight**2
         vectorLen=math.sqrt(vectorLen)
         vectorLength[docNo]=vectorLen
 
@@ -224,10 +227,11 @@ print("Preprocessing elapsed time:",endTime-startTime,"seconds") #progress bar
 startTime=time.perf_counter() #progress bar
 vector=vectorSpaceModel(doc_dic)
 endTime=time.perf_counter() #progress bar
-print("Preprocessing elapsed time:",endTime-startTime,"seconds") #progress bar
+print("Indexing elapsed time:",endTime-startTime,"seconds") #progress bar
 
 
 #process queries into tokens
+startTime=time.perf_counter() #progress bar
 queryPath="topics1-50.txt"
 queries=queryProcessor(queryPath)
 print("Query vectors created") #progress bar
@@ -237,8 +241,10 @@ for query_num in range(len(queries)):
     similarity=retrieval(queries[query_num],vector) #retrieve relevant documents
     rankedList=ranking(similarity) #rank by similarity
     outputToFile(outfile,query_num,rankedList) #write results to file
-    print("Query Number",query_num,"finished") #progress bar
 outfile.close()
+
+endTime=time.perf_counter() #progress bar
+print("Query processing, ranking, retrieval elapsed time:",endTime-startTime,"seconds") #progress bar
 
 print("All done!") #progress bar
 
